@@ -53,8 +53,7 @@ public abstract class Secsie {
 		}
 		
 		// Check for special values with regexes
-		Matcher decimalMatcher = decimal.matcher(value);
-		if (decimalMatcher.find()) {
+		if (decimal.matcher(value).find()) {
 			conf.set(key, Double.parseDouble(value));
 		} else if (falsey.matcher(value).find()) {
 			conf.set(key, false);
