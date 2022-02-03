@@ -1,7 +1,8 @@
 package secsie;
 
-import dict.Dictionary;
+
 import dict.KeyError;
+import dict.Dictionary;
 
 import java.io.IOException;
 import java.nio.file.Files;
