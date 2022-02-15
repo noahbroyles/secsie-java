@@ -1,4 +1,4 @@
-package secsie;
+package com.pro.secsie;
 
 public class InvalidSyntax extends Exception {
 
