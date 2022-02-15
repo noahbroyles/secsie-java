@@ -39,6 +39,7 @@ public class Dictionary {
 	
 	
 	/* Object Methods */
+	
 	/***
 	 * Get the value of a selector from the Dictionary. Selectors are separated by dots(.)
 	 * @param selector the selector to lookup
@@ -46,7 +47,19 @@ public class Dictionary {
 	 * @throws KeyError if you try anything stupid
 	 */
 	public Object get(String selector) throws KeyError {
-		String[] path = selector.split("\\.", -1);
+		return this.get(selector, "\\.");
+	}
+	
+	
+	/***
+	 * Get the value of a selector from the Dictionary.
+	 * @param selector the selector to lookup
+	 * @param separator the regex to split the selector by
+	 * @return the value the selector points to
+	 * @throws KeyError if you try anything stupid
+	 */
+	public Object get(String selector, String separator) throws KeyError {
+		String[] path = selector.split(separator, -1);
 		Dictionary currentDict = this;
 		
 		String currentSelector = "";
@@ -72,11 +85,11 @@ public class Dictionary {
 			if (i == 0) {
 				currentSelector = key;
 			} else {
-				currentSelector = currentSelector + "." + key;
+				currentSelector = currentSelector + separator + key;
 			}
 			
 			try {
-				currentDict = (Dictionary) this.get(currentSelector);
+				currentDict = (Dictionary) this.get(currentSelector, separator);
 			} catch (ClassCastException ex ) {
 				throw new KeyError(currentSelector, "not a Dictionary! Cannot get attribute '" + path[i + 1] + "'");
 			}
@@ -96,7 +109,6 @@ public class Dictionary {
 		return this.values.get(index);
 	}
 	
-	
 	/***
 	 * Sets the value of a selector to the value given. If the path in the dictionary doesn't yet exist, a dictionary to hold the path will be created for you.
 	 * @param selector the path to put the object under, separated by dots(.)
@@ -104,7 +116,19 @@ public class Dictionary {
 	 * @throws KeyError 
 	 */
 	public void set(String selector, Object value) throws KeyError {
-		String[] path = selector.split("\\.", -1);
+		this.set(selector, value, "\\.");
+	}
+	
+	
+	/***
+	 * Sets the value of a selector to the value given. If the path in the dictionary doesn't yet exist, a dictionary to hold the path will be created for you.
+	 * @param selector the path to put the object under
+	 * @param value the object to set
+	 * @param separator the regex to split the selector with
+	 * @throws KeyError 
+	 */
+	public void set(String selector, Object value, String separator) throws KeyError {
+		String[] path = selector.split(separator, -1);
 		Dictionary currentDict = this;
 		
 		String currentSelector = "";
@@ -135,11 +159,11 @@ public class Dictionary {
 			if (i == 0) {
 				currentSelector = key;
 			} else {
-				currentSelector = currentSelector + "." + key;
+				currentSelector = currentSelector + separator + key;
 			}
 			
 			try {
-				currentDict = (Dictionary) this.get(currentSelector);
+				currentDict = (Dictionary) this.get(currentSelector, separator);
 			} catch (ClassCastException ex ) {
 				throw new KeyError(currentSelector, "not a Dictionary! Cannot set attribute '" + path[i + 1] + "'");
 			}
