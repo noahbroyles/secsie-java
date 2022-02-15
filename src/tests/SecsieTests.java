@@ -1,13 +1,17 @@
 package tests;
+
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
+import com.pro.secsie.InvalidSyntax;
+
 import dict.Dictionary;
 import dict.KeyError;
-import secsie.*;
+import com.pro.secsie.*;
 
 class SecsieTests {
 
@@ -42,6 +46,7 @@ class SecsieTests {
 			Dictionary d = Secsie.parseConfig(config, "secsie");
 			System.out.println(d);
 			assertEquals(d.get("anotherSection.sections"), "are amazing");
+			assertEquals(d.get("special_values~nah.ninja", "~"), null);
 		} catch (NumberFormatException | InvalidSyntax | KeyError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -55,6 +60,8 @@ class SecsieTests {
 		
 			Dictionary conf = Secsie.parseConfigFile(path, "secsie");
 			assertEquals(conf.get("special_values.int"), 42);
+			System.out.println(Secsie.generateConfig(conf));
+			Secsie.generateConfigFile(conf, "/home/nbroyles/eclipse-workspace/SecsieConf/output.secsie");
 			
 		}
 }
