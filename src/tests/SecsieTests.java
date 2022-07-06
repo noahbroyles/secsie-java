@@ -1,52 +1,50 @@
 package tests;
 
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import dict.KeyError;
+import dict.Dictionary;
+import com.pro.secsie.*;
 import java.io.IOException;
-
 import org.junit.jupiter.api.Test;
-
 import com.pro.secsie.InvalidSyntax;
 
-import dict.Dictionary;
-import dict.KeyError;
-import com.pro.secsie.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SecsieTests {
 
 	@Test
 	void testConfigParse() {
 		
-		String config = "; This is an example of a valid secsie file\n" + 
-				"\n" + 
-				"before_section = totally okay\n" + 
-				"\n" + 
-				"# Whitespace don't matter\n" + 
-				"\n" + 
-				"; Here are examples of how types are interpreted(no keywords are off limits!)\n" + 
-				"[special_values]\n" + 
-				"    int = 42\n" + 
-				"    float = 269.887  # my man!\n" + 
-				"    truth = yes\n" + 
-				"    falsehood = no\n" + 
-				"    true = true\n" + 
-				"    ; I don't encourage this but it's valid ;)\n" + 
-				"    false = FaLSe\n" + 
-				"\n" + 
-				"    # Null value\n" + 
-				"    nah.ninja = Null\n" + 
-				"\n" + 
-				"[anotherSection]\n" + 
-				"    # The indent here is optional, included for readability\n" + 
-				"    sections = are amazing\n" + 
-				"";
+		String config = """
+				; This is an example of a valid secsie file
+
+				before_section = totally okay
+
+				# Whitespace don't matter
+
+				; Here are examples of how types are interpreted(no keywords are off limits!)
+				[special_values]
+				    int = 42
+				    float = 269.887  # my man!
+				    truth = yes
+				    falsehood = no
+				    true = true
+				    ; I don't encourage this but it's valid ;)
+				    false = FaLSe
+
+				    # Null value
+				    nah.ninja = Null
+
+				[anotherSection]
+				    # The indent here is optional, included for readability
+				    sections = are amazing
+				""";
 		
 		try {
 			Dictionary d = Secsie.parseConfig(config, "secsie");
 			System.out.println(d);
 			assertEquals(d.get("anotherSection.sections"), "are amazing");
-			assertEquals(d.get("special_values~nah.ninja", "~"), null);
+			assertNull(d.get("special_values~nah.ninja", "~"));
 		} catch (NumberFormatException | InvalidSyntax | KeyError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -58,10 +56,20 @@ class SecsieTests {
 	void testFileParse() throws NumberFormatException, IOException, InvalidSyntax, KeyError {
 		String path = "/home/nbroyles/PycharmProjects/secsie-conf/examples/valid.secsie.conf";
 		
-			Dictionary conf = Secsie.parseConfigFile(path, "secsie");
-			assertEquals(conf.get("special_values.int"), 42);
-			System.out.println(Secsie.generateConfig(conf));
-			Secsie.generateConfigFile(conf, "/home/nbroyles/eclipse-workspace/SecsieConf/output.secsie");
+		Dictionary conf = Secsie.parseConfigFile(path, "secsie");
+		assertEquals(conf.get("special_values.int"), 42);
+		System.out.println(Secsie.generateConfig(conf));
+		Secsie.generateConfigFile(conf, "/home/nbroyles/eclipse-workspace/SecsieConf/output.secsie");
 			
-		}
+	}
+
+	@Test
+	void testPoundSignInValue() throws NumberFormatException, InvalidSyntax, KeyError {
+		String config = """
+				password = som#taki$ # yesirrrr
+				""";
+
+		Dictionary conf = Secsie.parseConfig(config, "secsie");
+		assertEquals("som#taki$", conf.get("password"));
+	}
 }
