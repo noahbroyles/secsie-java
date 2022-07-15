@@ -8,10 +8,25 @@ import org.json.JSONException;
 
 
 /**
- * This class is meant to model a dictionary structure similar to Python. I made it because I was not at all satisfied with hash tables and such.
- * The only thing I wasn't able to do was figure out how to use square bracket syntax, e.g. dictionary["key"] = "value".
- * 
- * This dictionary class only supports string keys, but allows lookup of values by an integer dict position. Kinda jank.
+ * This class is meant to model a Dictionary structure similar to Python. I made it because I was not at all satisfied with hash tables and such.
+ * <br><br>
+ *
+ * This dictionary class only supports string keys, <b>not</b> integers or other primitives. However, it allows getting and setting of values with a nested selector.<br>
+ * For example, in the following code: <br>
+ * <pre><code>
+ * Dictionary dict = new Dictionary();
+ * dict.set("current_total_price_set.shop_money.amount", "32.94", "\\.");
+ * System.out.println(dict.dumps());
+ * </code></pre>
+ * 5 things are happening:
+ * <ol>
+ *     <li>a new Dictionary called <code>dict</code> is created</li>
+ *     <li>a new nested Dictionary inside <code>dict</code> called <code>current_total_price_set</code> is created</li>
+ *     <li>a new nested Dictionary inside <code>current_total_price_set</code> called <code>shop_money</code> is created</li>
+ *     <li>a value called <code>amount</code> is set to <code>"32.94"</code> inside <code>shop_money</code></li>
+ *     <li><code>{"current_total_price_set":{"shop_money":{"amount":"32.94"}}}</code> is printed to the console</li>
+ * </ol>
+ * Selectors can be separated by the user's choice of value, but they must be a regular expression, for example <code>"\\."</code> to separate by dot(<code>.</code>).
  *
  * @author Noah Broyles
  *
@@ -19,19 +34,37 @@ import org.json.JSONException;
 public class Dictionary extends JSONObject {
 	
 	/*  Constructors  */
-	// Empty dict constructor
+
+	/**
+	 * Creates a new empty Dictionary
+	 */
 	public Dictionary() {
 		super();
 	}
 
+	/**
+	 * Creates a new Dictionary from a JSON string
+	 *
+	 * @param fromJson A String of valid JSON
+	 */
 	public Dictionary(String fromJson) {
 		super(fromJson);
 	}
 
+	/**
+	 * Creates a new Dictionary from a Map.
+	 */
 	public Dictionary(Map<?, ?> map) {
 		super(map);
 	}
-	
+
+	/**
+	 * Creates a Dictionary from a String[] of keys and an Object[] of values. The arrays <br>must</br> be of equal length.
+	 * The Dictionary will be created by mapping each key in the <code>keys</code> array to the Object in the corresponding position in the <code>values</code> array.
+	 *
+	 * @param keys A String array containing the keys
+	 * @param values An Object array containing the values
+	 */
 	public Dictionary(String[] keys, Object[] values) {
 		super(dict(keys, values));
 	}
@@ -48,7 +81,7 @@ public class Dictionary extends JSONObject {
 
 	
 	/**
-	 * Get the value of a selector from the Dictionary. Selectors are separated by dots(.)
+	 * Get the value at the end of the selector from the Dictionary. Selectors are separated by dots(.)
 	 *
 	 * @param selector the selector to lookup
 	 * @return the value the selector points to
@@ -88,13 +121,12 @@ public class Dictionary extends JSONObject {
 
 	
 	/**
-	 * Get the value of a selector from the Dictionary. An example of a selector would be "order.price.total_price_usd".
-	 * That selector would look for a nested Object called "total_price_usd" inside a Dictionary called "price" inside a Dictionary called "order".
+	 * Get the value a selector points to from the Dictionary.
 	 *
 	 * @param selector the selector to lookup
 	 * @param separator the regex to split the selector by
 	 * @return the (Object) value that the selector points to
-	 * @throws KeyError if you try anything stupid
+	 * @throws KeyError if you try to select past a value into a path that doesn't exist.
 	 */
 	public Object select(String selector, String separator) throws KeyError {
 		String[] keyPath = selector.split(separator);
@@ -112,13 +144,13 @@ public class Dictionary extends JSONObject {
 
 			return finalObject;
 		} catch (ClassCastException ex) {
-			throw new KeyError(selector, ex.getMessage());
+			throw new KeyError(selector, "The specified selector be selected because not all nested values are Dictionaries");
 		}
 
 	}
 
 	/**
-	 * Set's the final path at the end of a selector to a given value. Supports nested Dictionaries, and if a Dictionary on the path
+	 * Set's the final path at the end of a selector to a given value. Supports nested Dictionaries. If a Dictionary on the path
 	 * doesn't yet exist, it will be created for you.
 	 *
 	 * @param selector The selector to use
