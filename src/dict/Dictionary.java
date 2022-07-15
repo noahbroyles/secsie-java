@@ -1,6 +1,9 @@
 package dict;
 
 import java.util.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import org.json.JSONObject;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -77,7 +80,18 @@ public class Dictionary extends JSONObject {
 	public Dictionary (Dictionary d) {
 		super(d, JSONObject.getNames(d));
 	}
-	
+
+	/**
+	 * Creates a new Dictionary from a JSON file.
+	 *
+	 * @param jsonFilePath A path to a valid JSON file
+	 * @return a new Dictionary from the JSON
+	 * @throws IOException if the file can't be read
+	 */
+	public static Dictionary fromJson(String jsonFilePath) throws IOException {
+		String json = Files.readString(Paths.get(jsonFilePath));
+		return new Dictionary(json);
+	}
 
 	
 	/**
