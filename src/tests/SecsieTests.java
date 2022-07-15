@@ -43,8 +43,7 @@ class SecsieTests {
 		try {
 			Dictionary d = Secsie.parseConfig(config, "secsie");
 			System.out.println(d);
-			assertEquals(d.get("anotherSection.sections"), "are amazing");
-			assertNull(d.get("special_values~nah.ninja", "~"));
+			assertEquals(d.select("anotherSection.sections"), "are amazing");
 		} catch (NumberFormatException | InvalidSyntax | KeyError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -57,7 +56,7 @@ class SecsieTests {
 		String path = "/home/nbroyles/PycharmProjects/secsie-conf/examples/valid.secsie.conf";
 		
 		Dictionary conf = Secsie.parseConfigFile(path, "secsie");
-		assertEquals(conf.get("special_values.int"), 42);
+		assertEquals(conf.select("special_values.int"), 42);
 		System.out.println(Secsie.generateConfig(conf));
 		Secsie.generateConfigFile(conf, "/home/nbroyles/eclipse-workspace/SecsieConf/output.secsie");
 			
@@ -66,10 +65,13 @@ class SecsieTests {
 	@Test
 	void testPoundSignInValue() throws NumberFormatException, InvalidSyntax, KeyError {
 		String config = """
-				password = som#taki$ # yesirrrr
+				# I'm gonna need this line to be ignored
+				password = som#taki$ # yes sirree
+				jim = the#1\040
 				""";
 
 		Dictionary conf = Secsie.parseConfig(config, "secsie");
 		assertEquals("som#taki$", conf.get("password"));
+		assertEquals("the#1", conf.get("jim"));
 	}
 }
