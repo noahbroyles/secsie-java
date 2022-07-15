@@ -28,7 +28,7 @@ public abstract class Secsie {
 	private static final Pattern truthy = Pattern.compile("^(true|yes)$", Pattern.CASE_INSENSITIVE);
 
 	
-	private static Dictionary writeToConf(Dictionary conf, String line, int lineNumber, String section, String mode) throws InvalidSyntax, NumberFormatException {
+	private static void writeToConf(Dictionary conf, String line, int lineNumber, String section, String mode) throws InvalidSyntax, NumberFormatException {
 		// Split the line at the equals sign
 		String[] keyValue = line.split("=", 2);
 		
@@ -76,8 +76,6 @@ public abstract class Secsie {
 			}
 		} catch (KeyError ignored) {}  // Ignored because it will never happen
 
-		return conf;
-		
 	}
 	
 	
@@ -111,7 +109,7 @@ public abstract class Secsie {
 			}
 
 			// Save the line in the conf
-			conf = writeToConf(conf, line, lineno, cSection, mode);
+			writeToConf(conf, line, lineno, cSection, mode);
 		}
 
 		return conf;
